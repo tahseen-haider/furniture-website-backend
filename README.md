@@ -90,8 +90,8 @@ By default, the server listens on the port set in `PORT` (fallback 4000).
 Below are example endpoints. Adjust to match your implementation.
 
 - Auth
-	- `POST /api/auth/register` — create a new user (body: `email`, `password`, ...)
-	- `POST /api/auth/login` — login (body: `email`, `password`) → returns JWT
+  - `POST /api/auth/register` — create a new user (body: `email`, `password`, ...)
+  - `POST /api/auth/login` — login (body: `email`, `password`) → returns JWT
 
 For protected routes, include the header:
 
