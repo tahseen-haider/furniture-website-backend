@@ -16,18 +16,23 @@
     "#controllers": "./src/controllers/index.js",
     "#routes": "./src/routes/index.js",
     "#middlewares": "./src/middlewares/index.js",
-    "#models": "./src/models/index.js*",
+    "#models": "./src/models/index.js",
     "#utils": "./src/utils/index.js",
-    "#services": "./src/services/index.js"
+    "#services": "./src/services/index.js",
+    "#db": "./src/db/index.js"
   },
   "keywords": [],
   "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^7.0.11",
     "pg": "^8.16.3"
   },
   "devDependencies": {
