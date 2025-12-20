@@ -1,12 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { appRoutes } from '#routes';
 import { errorMiddleware } from '#middlewares';
 import { initTables } from '#db';
 import cookieParser from 'cookie-parser';
 
-dotenv.config();
 const app = express();
 
 await initTables();

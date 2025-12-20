@@ -4,7 +4,39 @@ import {
   verifyEmailService,
   sendVerifyEmailService,
   getCurrentUserService,
+  loginWithGoogleService,
 } from '#services';
+
+import jwt from 'jsonwebtoken';
+
+export const googleAuthCallback = async (req, res, next) => {
+  try {
+    const profile = req.user;
+    const user = await loginWithGoogleService(profile);
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
+    res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+
+    res.send(`
+      <html>
+        <body>
+          <script>
+            if (window.opener) {
+              window.opener.postMessage('oauth-success', '${process.env.CLIENT_URL || 'http://localhost:5173'}');
+              window.close();
+            } else {
+              window.location.href = '${process.env.CLIENT_URL || 'http://localhost:5173'}';
+            }
+          </script>
+        </body>
+      </html>
+    `);
+  } catch (err) {
+    next(err);
+  }
+};
 
 export const signup = async (req, res, next) => {
   try {
@@ -34,9 +66,8 @@ export const sendVerifyEmail = async (req, res, next) => {
 
 export const verifyEmail = async (req, res, next) => {
   try {
-    const user = await verifyEmailService(req.query.token);
-    if (!user) return res.status(400).json({ message: 'Invalid token' });
-    res.json({ message: 'Email verified successfully' });
+    await verifyEmailService(req.query.token);
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/login`);
   } catch (err) {
     next(err);
   }
