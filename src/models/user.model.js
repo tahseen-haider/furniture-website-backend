@@ -29,10 +29,36 @@ export const createUser = async ({
   return rows[0];
 };
 
+export const setVerificationToken = async (email, token) => {
+  const { rows } = await pool.query(
+    `UPDATE users
+     SET verification_token = $1
+     WHERE email = $2
+     RETURNING id, email`,
+    [token, email]
+  );
+
+  if (rows.length === 0) {
+    const error = new Error('User not found');
+    error.status = 404;
+    throw error;
+  }
+
+  return rows[0];
+};
+
 export const findUserByEmail = async (email) => {
   const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [
     email,
   ]);
+  return rows[0] || null;
+};
+
+export const findUserById = async (id) => {
+  const { rows } = await pool.query(
+    'SELECT id, email, username FROM users WHERE id = $1',
+    [id]
+  );
   return rows[0] || null;
 };
 
