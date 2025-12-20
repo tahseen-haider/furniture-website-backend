@@ -1,5 +1,70 @@
 import { pool } from '#config';
 
+export const updatePasswordByEmail = async (email, hashedPassword) => {
+  const { rows } = await pool.query(
+    `UPDATE users
+     SET password = $1,
+         verification_token = NULL
+     WHERE email = $2
+     RETURNING id, email`,
+    [hashedPassword, email]
+  );
+
+  return rows[0] || null;
+};
+
+export const findUserByGoogleOrEmail = async (googleId, email) => {
+  const { rows } = await pool.query(
+    `SELECT * FROM users
+     WHERE google_id = $1 OR email = $2`,
+    [googleId, email]
+  );
+
+  return rows[0] || null;
+};
+
+export const createGoogleUser = async ({ email, username, googleId }) => {
+  const { rows } = await pool.query(
+    `INSERT INTO users (
+        email,
+        username,
+        password,
+        verification_token,
+        google_id,
+        is_verified
+     )
+     VALUES ($1, $2, NULL, NULL, $3, TRUE)
+     RETURNING *`,
+    [email, username, googleId]
+  );
+
+  return rows[0];
+};
+
+export const attachGoogleIdToUser = async (userId, googleId) => {
+  const { rows } = await pool.query(
+    `UPDATE users
+     SET google_id = $1
+     WHERE id = $2
+     RETURNING *`,
+    [googleId, userId]
+  );
+
+  return rows[0];
+};
+
+export const verifyUserById = async (userId) => {
+  const { rows } = await pool.query(
+    `UPDATE users
+     SET is_verified = TRUE
+     WHERE id = $1
+     RETURNING *`,
+    [userId]
+  );
+
+  return rows[0];
+};
+
 export const createUser = async ({
   email,
   password,
