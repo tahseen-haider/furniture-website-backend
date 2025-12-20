@@ -9,9 +9,37 @@ import {
   setVerificationToken,
   findUserById,
 } from '#models';
-import { sendVerificationEmail } from '#utils';
+import { sendVerificationEmail, sendPasswordResetEmail } from '#utils';
 
 import { pool } from '#config';
+
+const createError = (message, status = 400) => {
+  const err = new Error(message);
+  err.status = status;
+  return err;
+};
+
+export const resetPasswordService = async (email, token, newPassword) => {
+  const user = await findUserByEmail(email);
+  if (!user) throw createError('User not found', 404);
+
+  if (user.verification_token !== token) {
+    throw createError('Invalid or expired token', 400);
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  const { rows } = await pool.query(
+    `UPDATE users
+     SET password = $1,
+         verification_token = NULL
+     WHERE email = $2
+     RETURNING id, email`,
+    [hashedPassword, email]
+  );
+
+  return rows[0];
+};
 
 export const loginWithGoogleService = async (profile) => {
   const { id: googleId, emails, displayName } = profile;
@@ -116,10 +144,13 @@ export const verifyEmailService = async (token) => {
   if (!user) throw new Error('Invalid or expired token');
 };
 
-const createError = (message, status = 400) => {
-  const err = new Error(message);
-  err.status = status;
-  return err;
+export const sendPasswordResetEmailService = async (email) => {
+  const user = await findUserByEmail(email);
+  if (!user) throw createError('User not found', 404);
+
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  await setVerificationToken(email, resetToken);
+  await sendPasswordResetEmail(email, resetToken);
 };
 
 export const loginService = async (email, password) => {
@@ -127,7 +158,10 @@ export const loginService = async (email, password) => {
   if (!user) throw createError('User not found', 404);
   if (!user.is_verified) throw createError('Email not verified', 403);
   if (!user.password)
-    throw createError('User registered via Google OAuth', 400);
+    throw createError(
+      'User registered via Google OAuth, Set Password to Login using email/password',
+      400
+    );
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw createError('Incorrect password', 401);
