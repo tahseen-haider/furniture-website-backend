@@ -2,7 +2,13 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
-import { createUser, findUserByEmail, verifyUserByToken } from '#models';
+import {
+  createUser,
+  findUserByEmail,
+  verifyUserByToken,
+  setVerificationToken,
+  findUserById,
+} from '#models';
 import { sendVerificationEmail } from '#utils';
 
 export const signupService = async (email, password, username) => {
@@ -18,6 +24,15 @@ export const signupService = async (email, password, username) => {
 
   await sendVerificationEmail(email, verificationToken);
   return user;
+};
+
+export const sendVerifyEmailService = async (email) => {
+  if (!email) {
+    throw new Error('Invalid email');
+  }
+  const verificationToken = crypto.randomBytes(32).toString('hex');
+  await setVerificationToken(email, verificationToken);
+  await sendVerificationEmail(email, verificationToken);
 };
 
 export const verifyEmailService = async (token) => {
@@ -42,4 +57,11 @@ export const loginService = async (email, password) => {
     user: { id: user.id, email: user.email, username: user.username },
     token,
   };
+};
+
+export const getCurrentUserService = async (token) => {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await findUserById(decoded.id);
+
+  return { user };
 };
