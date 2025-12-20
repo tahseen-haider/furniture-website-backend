@@ -30,6 +30,25 @@ export const createUser = async ({
 };
 
 export const setVerificationToken = async (email, token) => {
+  const { rows: users } = await pool.query(
+    `
+    SELECT is_verified FROM users WHERE email = $1
+  `,
+    [email]
+  );
+
+  if (users.length === 0) {
+    const error = new Error('User not found');
+    error.status = 404;
+    throw error;
+  }
+
+  if (users[0].is_verified) {
+    const error = new Error('User is already verified');
+    error.status = 400;
+    throw error;
+  }
+
   const { rows } = await pool.query(
     `UPDATE users
      SET verification_token = $1
@@ -37,12 +56,6 @@ export const setVerificationToken = async (email, token) => {
      RETURNING id, email`,
     [token, email]
   );
-
-  if (rows.length === 0) {
-    const error = new Error('User not found');
-    error.status = 404;
-    throw error;
-  }
 
   return rows[0];
 };
