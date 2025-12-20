@@ -8,10 +8,13 @@ import {
   verifyUserByToken,
   setVerificationToken,
   findUserById,
+  updatePasswordByEmail,
+  findUserByGoogleOrEmail,
+  createGoogleUser,
+  attachGoogleIdToUser,
+  verifyUserById,
 } from '#models';
 import { sendVerificationEmail, sendPasswordResetEmail } from '#utils';
-
-import { pool } from '#config';
 
 const createError = (message, status = 400) => {
   const err = new Error(message);
@@ -29,51 +32,27 @@ export const resetPasswordService = async (email, token, newPassword) => {
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  const { rows } = await pool.query(
-    `UPDATE users
-     SET password = $1,
-         verification_token = NULL
-     WHERE email = $2
-     RETURNING id, email`,
-    [hashedPassword, email]
-  );
-
-  return rows[0];
+  return await updatePasswordByEmail(email, hashedPassword);
 };
 
 export const loginWithGoogleService = async (profile) => {
   const { id: googleId, emails, displayName } = profile;
   const email = emails[0].value;
 
-  let { rows } = await pool.query(
-    'SELECT * FROM users WHERE google_id = $1 OR email = $2',
-    [googleId, email]
-  );
-
-  let user = rows[0];
+  let user = await findUserByGoogleOrEmail(googleId, email);
 
   if (!user) {
-    const insertRes = await pool.query(
-      `INSERT INTO users (email, username, password, verification_token, google_id, is_verified)
-       VALUES ($1, $2, $3, $4, $5, TRUE)
-       RETURNING *`,
-      [email, displayName, null, null, googleId]
-    );
-    user = insertRes.rows[0];
+    user = await createGoogleUser({
+      email,
+      username: displayName,
+      googleId,
+    });
   } else if (!user.google_id) {
-    const updateRes = await pool.query(
-      'UPDATE users SET google_id = $1 WHERE id = $2 RETURNING *',
-      [googleId, user.id]
-    );
-    user = updateRes.rows[0];
+    user = await attachGoogleIdToUser(user.id, googleId);
   }
 
   if (!user.is_verified) {
-    const verifyRes = await pool.query(
-      'UPDATE users SET is_verified = TRUE WHERE id = $1 RETURNING *',
-      [user.id]
-    );
-    user = verifyRes.rows[0];
+    user = await verifyUserById(user.id);
   }
 
   return user;
