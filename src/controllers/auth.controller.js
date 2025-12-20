@@ -5,6 +5,8 @@ import {
   sendVerifyEmailService,
   getCurrentUserService,
   loginWithGoogleService,
+  sendPasswordResetEmailService,
+  resetPasswordService,
 } from '#services';
 
 import jwt from 'jsonwebtoken';
@@ -59,6 +61,41 @@ export const sendVerifyEmail = async (req, res, next) => {
     await sendVerifyEmailService(email);
 
     res.json({ message: 'Verification email sent successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const requestPasswordSet = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    await sendPasswordResetEmailService(email);
+
+    res.json({
+      message: 'Password set email sent successfully. Check your email',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, token, password } = req.body;
+    if (!email || !token || !password) {
+      return res
+        .status(400)
+        .json({ message: 'Email, token and password are required' });
+    }
+
+    await resetPasswordService(email, token, password);
+
+    res.json({ message: 'Password has been reset successfully' });
   } catch (err) {
     next(err);
   }

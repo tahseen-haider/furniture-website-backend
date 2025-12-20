@@ -43,12 +43,6 @@ export const setVerificationToken = async (email, token) => {
     throw error;
   }
 
-  if (users[0].is_verified) {
-    const error = new Error('User is already verified');
-    error.status = 400;
-    throw error;
-  }
-
   const { rows } = await pool.query(
     `UPDATE users
      SET verification_token = $1
