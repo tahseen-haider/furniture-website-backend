@@ -44,3 +44,50 @@ export const sendPasswordResetEmail = async (email, token) => {
   `;
   await sendEmail(email, 'Reset your password', html);
 };
+
+export const sendOrderTrackingEmail = async ({ email, trackingId }) => {
+  const trackUrl = `${
+    process.env.CLIENT_URL || 'http://localhost:5173'
+  }/track-order`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+      <h2 style="color: #333;">Your Order Has Been Placed 🎉</h2>
+
+      <p style="color: #555;">
+        Thank you for your order! Your order has been successfully placed and is being processed.
+      </p>
+
+      <div style="background: #ffffff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+        <p style="margin: 5px 0 0; color: #333;">
+          <strong>Tracking ID:</strong> ${trackingId}
+        </p>
+      </div>
+
+      <a
+        href="${trackUrl}"
+        style="
+          display: inline-block;
+          padding: 12px 24px;
+          background-color: #4CAF50;
+          color: #ffffff;
+          text-decoration: none;
+          border-radius: 5px;
+          font-weight: bold;
+        "
+      >
+        Track Your Order
+      </a>
+
+      <p style="color: #777; font-size: 13px; margin-top: 20px;">
+        You can use this tracking ID anytime on our website to check your order status.
+      </p>
+
+      <p style="color: #999; font-size: 12px;">
+        If you did not place this order, please contact our support immediately.
+      </p>
+    </div>
+  `;
+
+  await sendEmail(email, 'Your Order Tracking Details', html);
+};

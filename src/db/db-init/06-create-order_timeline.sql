@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS order_timeline (
+  id SERIAL PRIMARY KEY,
+  order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  status VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
