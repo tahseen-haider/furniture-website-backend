@@ -42,9 +42,10 @@ export const insertOrder = async (
       shipping_address_id,
       billing_address_id,
       billing_same_as_shipping,
-      status
+      status,
+      estimated_delivery
     )
-    VALUES ($1,$2,$3,$4,$5,$6,$7)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
     RETURNING id
     `,
     [
@@ -55,6 +56,7 @@ export const insertOrder = async (
       billingAddressId,
       billingSameAsShipping,
       status,
+      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     ]
   );
 

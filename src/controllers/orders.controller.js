@@ -2,11 +2,9 @@ import { createOrder, getOrderByTrackingId } from '#services';
 
 export const placeOrder = async (req, res) => {
   try {
-    console.log(req.body);
     const userId = req.user?.id || null;
     const orderData = req.body;
 
-    console.log(orderData);
     const order = await createOrder(userId, orderData);
 
     return res.status(201).json({

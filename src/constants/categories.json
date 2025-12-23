@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "title": "Bed Sets",
+    "link": "/collections/bed-sets",
+    "image": "/images/collections/bed-sets.webp"
+  },
+  {
+    "id": 2,
+    "title": "Dining Tables",
+    "link": "/collections/dining-sets",
+    "image": "/images/collections/dining-sets.webp"
+  },
+  {
+    "id": 3,
+    "title": "Sofa and Chairs",
+    "link": "/collections/sofa-sets-chairs",
+    "image": "/images/collections/sofa-sets-chairs.webp"
+  },
+  {
+    "id": 4,
+    "title": "Cushions",
+    "link": "/collections/cushions",
+    "image": "/images/collections/cushions.webp"
+  },
+  {
+    "id": 5,
+    "title": "Consoles & Frames",
+    "link": "/collections/console-frames",
+    "image": "/images/collections/console-frames.webp"
+  },
+  {
+    "id": 6,
+    "title": "Planters",
+    "link": "/collections/planters",
+    "image": "/images/collections/planters.webp"
+  },
+  {
+    "id": 7,
+    "title": "Home Accessories",
+    "link": "/collections/home-accessories",
+    "image": "/images/collections/home-accessories.webp"
+  },
+  {
+    "id": 8,
+    "title": "Chests & Sideboards",
+    "link": "/collections/chests",
+    "image": "/images/collections/chests.webp"
+  },
+  {
+    "id": 9,
+    "title": "Mirror Frames",
+    "link": "/collections/mirror-frames",
+    "image": "/images/collections/mirror-frames.webp"
+  },
+  {
+    "id": 10,
+    "title": "Table Decor",
+    "link": "/collections/table-decor",
+    "image": "/images/collections/table-decor.webp"
+  },
+  {
+    "id": 11,
+    "title": "Lamps & Lights",
+    "link": "/collections/lamps-lights",
+    "image": "/images/collections/lamps-lights.webp"
+  },
+  {
+    "id": 12,
+    "title": "Table Lamps and Lights",
+    "link": "/collections/table-lamps",
+    "image": "/images/collections/table-lamps.webp"
+  },
+  {
+    "id": 13,
+    "title": "Coffee and Center Tables",
+    "link": "/collections/tables",
+    "image": "/images/collections/tables.webp"
+  },
+  {
+    "id": 14,
+    "title": "Writing Desks",
+    "link": "/collections/writing-desk",
+    "image": "/images/collections/writing-desk.webp"
+  },
+  {
+    "id": 15,
+    "title": "Swings",
+    "link": "/collections/swings",
+    "image": "/images/collections/swings.webp"
+  },
+  {
+    "id": 16,
+    "title": "Sculptures",
+    "link": "/collections/sculptures",
+    "image": "/images/collections/sculptures.webp"
+  }
+]
