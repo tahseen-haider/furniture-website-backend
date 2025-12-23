@@ -1,0 +1,168 @@
+{
+  "product": {
+    "id": 8,
+    "title": "Antique Mirror Frame",
+    "price": [14000, 18000],
+    "slug": "antique-mirror-frame",
+    "categories": ["Decor"],
+    "generalCategory": "Home Decor",
+    "vendor": "Vendor Name",
+
+    "description": "Beautiful antique mirror frame with intricate carvings. Adds elegance and sophistication to any room or hallway.",
+    "features": [
+      "Intricate antique design",
+      "High-quality frame material",
+      "Perfect for walls or as a decorative piece",
+      "Durable and long-lasting"
+    ],
+
+    "images": [
+      "https://images.unsplash.com/photo-1688650963441-a4ce8fa08d50?q=80&w=465&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1612392549386-b6969764af6f?q=80&w=428&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ],
+
+    "freeShipping": true,
+    "available": "in",
+    "sold": 0,
+    "itemsInStock": 100,
+    "createdAt": "2025-12-10",
+
+    "variants": [
+      { "id": "ANTIQUE-MIRROR-FRAME-STD", "title": "Standard", "price": 14000 },
+      { "id": "ANTIQUE-MIRROR-FRAME-LRG", "title": "Premium", "price": 18000 }
+    ],
+
+    "buyTogether": [
+      {
+        "id": 4,
+        "title": "Golden Console with Mirror Frame",
+        "price": [38000, 52000],
+        "images": [
+          "https://plus.unsplash.com/premium_photo-1664391898455-1f0440785804?q=80&w=835&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          "https://plus.unsplash.com/premium_photo-1733514692259-57cdff0a750f?q=80&w=464&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        ],
+        "variants": [
+          { "id": "GOLDEN-CONSOLE-STD", "title": "Standard", "price": 38000 },
+          { "id": "GOLDEN-CONSOLE-LRG", "title": "Premium", "price": 52000 }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Classic Wooden Chest",
+        "price": [54000, 59400],
+        "images": [
+          "https://images.unsplash.com/photo-1658081973932-faaca64ecfd2?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          "https://images.unsplash.com/photo-1728939862876-1c7e36d9cdfa?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        ],
+        "variants": [
+          {
+            "id": "CLASSIC-WOODEN-CHEST-STD",
+            "title": "Standard",
+            "price": 54000
+          },
+          {
+            "id": "CLASSIC-WOODEN-CHEST-LRG",
+            "title": "Premium",
+            "price": 59400
+          }
+        ]
+      }
+    ],
+
+    "relatedProducts": [
+      {
+        "id": 1,
+        "title": "Luxury King Bed Set",
+        "price": [95000, 120000],
+        "images": [
+          "https://m.media-amazon.com/images/I/81sPXy691%2BL._AC_SL1500_.jpg",
+          "https://plus.unsplash.com/premium_photo-1683120772181-a82af8464b62?q=80&w=1024&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        ],
+        "variants": [
+          { "id": "BED-STD", "title": "Standard King Size", "price": 95000 },
+          { "id": "BED-LRG", "title": "Premium King Size", "price": 120000 }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Premium Bed Linen Set",
+        "price": [8500, 9350],
+        "images": [
+          "https://plus.unsplash.com/premium_photo-1733514432866-6ca2ad63cc3f?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          "https://plus.unsplash.com/premium_photo-1733514432845-728bac382e12?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        ],
+        "variants": [
+          {
+            "id": "PREMIUM-BED-LINEN-SET-STD",
+            "title": "Standard",
+            "price": 8500
+          },
+          {
+            "id": "PREMIUM-BED-LINEN-SET-LRG",
+            "title": "Premium",
+            "price": 9350
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Memory Foam Pillows (Pack of 2)",
+        "price": [4500, 4950],
+        "images": [
+          "https://plus.unsplash.com/premium_photo-1764499845516-2608332c5ebe?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          "https://plus.unsplash.com/premium_photo-1683120772181-a82af8464b62?q=80&w=1024&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        ],
+        "variants": [
+          {
+            "id": "MEMORY-FOAM-PILLOWS-STD",
+            "title": "Standard",
+            "price": 4500
+          },
+          { "id": "MEMORY-FOAM-PILLOWS-LRG", "title": "Premium", "price": 4950 }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Minimal Table Decor Set",
+        "price": 3500,
+        "images": [
+          "https://plus.unsplash.com/premium_photo-1671718840234-37e7c6c5001c?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          "https://plus.unsplash.com/premium_photo-1676838259090-81b78f1c5d11?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        ],
+        "variants": [
+          {
+            "id": "MINIMAL-TABLE-DECOR-SET-STD",
+            "title": "Standard",
+            "price": 3500
+          },
+          {
+            "id": "MINIMAL-TABLE-DECOR-SET-LRG",
+            "title": "Premium",
+            "price": 3850
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "LED Standing Floor Lamp",
+        "price": [9000, 14000],
+        "images": [
+          "https://images.unsplash.com/photo-1673939859210-23d8444237ff?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          "https://images.unsplash.com/photo-1600421684846-e7ebc943403b?q=80&w=386&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        ],
+        "variants": [
+          {
+            "id": "LED-STANDING-FLOOR-LAMP-STD",
+            "title": "Standard",
+            "price": 9000
+          },
+          {
+            "id": "LED-STANDING-FLOOR-LAMP-LRG",
+            "title": "Premium",
+            "price": 14000
+          }
+        ]
+      }
+    ]
+  }
+}

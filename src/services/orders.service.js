@@ -75,63 +75,63 @@ export const getOrderByTrackingId = async (trackingId) => {
   try {
     const { rows } = await client.query(
       `
-      SELECT
-      o.tracking_id AS "trackingId",
-      o.status,
-      o.estimated_delivery AS "estimatedDelivery",
-      o.billing_same_as_shipping AS "billingSameAsShipping",
-      -- shipping address
-      json_build_object(
-        'firstName', sa.first_name,
-        'lastName', sa.last_name,
-        'address', sa.address_line,
-        'city', sa.city,
-        'postalCode', sa.postal_code,
-        'phone', sa.phone,
-        'email', sa.email
-      ) AS "shippingAddress",
-      -- billing address
-      json_build_object(
-        'firstName', ba.first_name,
-        'lastName', ba.last_name,
-        'address', ba.address_line,
-        'city', ba.city,
-        'postalCode', ba.postal_code,
-        'phone', ba.phone,
-        'email', ba.email
-      ) AS "billingAddress",
-      -- products array
-      (
-        SELECT COALESCE(json_agg(
-          json_build_object(
-            'productId', oi.product_id,
-            'variantId', oi.variant_id,
-            'title', oi.title,
-            'variantTitle', oi.variant_title,
-            'quantity', oi.quantity,
-            'price', oi.price,
-            'image', oi.image,
-            'freeShipping', oi.free_shipping
-          )
-        ), '[]'::json)
-        FROM order_items oi
-        WHERE oi.order_id = o.id
-      ) AS products,
-      -- timeline array
-      (
-        SELECT COALESCE(json_agg(
-          json_build_object(
-            'date', ot.created_at::date,
-            'status', ot.status
-          ) ORDER BY ot.created_at
-        ), '[]'::json)
-        FROM order_timeline ot
-        WHERE ot.order_id = o.id
-      ) AS timeline
-    FROM orders o
-    LEFT JOIN addresses sa ON sa.id = o.shipping_address_id
-    LEFT JOIN addresses ba ON ba.id = o.billing_address_id
-    WHERE o.tracking_id::text = $1;
+        SELECT
+        o.tracking_id AS "trackingId",
+        o.status,
+        o.estimated_delivery AS "estimatedDelivery",
+        o.billing_same_as_shipping AS "billingSameAsShipping",
+        -- shipping address
+        json_build_object(
+          'firstName', sa.first_name,
+          'lastName', sa.last_name,
+          'address', sa.address_line,
+          'city', sa.city,
+          'postalCode', sa.postal_code,
+          'phone', sa.phone,
+          'email', sa.email
+        ) AS "shippingAddress",
+        -- billing address
+        json_build_object(
+          'firstName', ba.first_name,
+          'lastName', ba.last_name,
+          'address', ba.address_line,
+          'city', ba.city,
+          'postalCode', ba.postal_code,
+          'phone', ba.phone,
+          'email', ba.email
+        ) AS "billingAddress",
+        -- products array
+        (
+          SELECT COALESCE(json_agg(
+            json_build_object(
+              'productId', oi.product_id,
+              'variantId', oi.variant_id,
+              'title', oi.title,
+              'variantTitle', oi.variant_title,
+              'quantity', oi.quantity,
+              'price', oi.price,
+              'image', oi.image,
+              'freeShipping', oi.free_shipping
+            )
+          ), '[]'::json)
+          FROM order_items oi
+          WHERE oi.order_id = o.id
+        ) AS products,
+        -- timeline array
+        (
+          SELECT COALESCE(json_agg(
+            json_build_object(
+              'date', ot.created_at::date,
+              'status', ot.status
+            ) ORDER BY ot.created_at
+          ), '[]'::json)
+          FROM order_timeline ot
+          WHERE ot.order_id = o.id
+        ) AS timeline
+        FROM orders o
+        LEFT JOIN addresses sa ON sa.id = o.shipping_address_id
+        LEFT JOIN addresses ba ON ba.id = o.billing_address_id
+        WHERE o.tracking_id::text = $1;
       `,
       [trackingId]
     );
@@ -139,10 +139,9 @@ export const getOrderByTrackingId = async (trackingId) => {
     if (!rows[0]) return null;
 
     const res = rows[0];
-    res.estimatedDelivery = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0];
-    return rows[0];
+    res.estimatedDelivery = res.estimatedDelivery.toISOString().split('T')[0];
+
+    return res;
   } finally {
     client.release();
   }
