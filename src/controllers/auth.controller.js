@@ -16,9 +16,13 @@ export const googleAuthCallback = async (req, res, next) => {
     const profile = req.user;
     const user = await loginWithGoogleService(profile);
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
-    });
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1d',
+      }
+    );
     res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
 
     res.send(`

@@ -8,7 +8,9 @@
     "lint": "eslint . --ext .js,.ts",
     "lint-fix": "eslint . --ext .js,.ts --fix",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "seed:categories": "node src/db/seed/seed-categories.js",
+    "seed:products": "node src/db/seed/seed-products.js"
   },
   "imports": {
     "#root/*": "./src/*",

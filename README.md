@@ -6,15 +6,15 @@ A production-ready Node.js + Express backend using PostgreSQL, JWT authenticatio
 
 ## 📦 Tech Stack
 
-- Node.js 20
-- Express (ESM)
-- PostgreSQL
-- JWT Authentication (Cookies)
-- Google OAuth 2.0
-- Nodemailer (Email)
-- Docker & Docker Compose
-- ESLint + Prettier
-- Husky (Git Hooks)
+* Node.js 20
+* Express (ESM)
+* PostgreSQL
+* JWT Authentication (Cookies)
+* Google OAuth 2.0
+* Nodemailer (Email)
+* Docker & Docker Compose
+* ESLint + Prettier
+* Husky (Git Hooks)
 
 ---
 
@@ -81,24 +81,38 @@ POSTGRES_DB=myappdb
 
 ### 1️⃣ Build & Start Containers
 
-> ⚠️ **Windows Users Warning:**  
-> Some scripts (like `wait-for-it.sh` or entrypoint scripts) may have **Windows-style line endings (`CRLF`)**.  
-> Linux containers require **Unix-style line endings (`LF`)**.  
+> ⚠️ **Windows Users Warning:**
+> Some scripts (like `wait-for-it.sh` or entrypoint scripts) may have **Windows-style line endings (`CRLF`)**.
+> Linux containers require **Unix-style line endings (`LF`)**.
 > Open the script in VS Code, check the bottom-right corner, and change `CRLF → LF`, then save.
 
-
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
 
 Services started:
 
-- Backend → [http://localhost:5000](http://localhost:5000)
-- PostgreSQL → localhost:5432
+* Backend → [http://localhost:5000](http://localhost:5000)
+* PostgreSQL → localhost:5432
 
 > Database tables are auto-initialized from `src/db/db-init/*.sql`.
 
+### 2️⃣ Seed Initial Data
+
+After the containers are running, you can seed the database with categories and products:
+
+```bash
+# Seed categories
+docker exec -it myapp-backend npm run seed:categories
+
+# Seed products
+docker exec -it myapp-backend npm run seed:products
+```
+
+> ✅ This ensures that your database has the initial data required for the backend to function properly.
+
 ---
+
 
 ## 🧪 Running Locally (Without Docker)
 
@@ -376,11 +390,47 @@ Response:
 
 **GET /api/products/category/:category**
 
+Optional query params: `price_min`, `price_max`, `sort`, `page`, `pageSize`
+
 ### 🧾 Product by ID
 
 **GET /api/products/:productId**
 
-> Loads data from `src/constants/product/{productId}.json`
+> Loads data from database including variants, images, features, buyTogether, relatedProducts
+
+### ➕ Product CRUD (Admin only)
+
+| Method | Endpoint            | Description    |
+| ------ | ------------------- | -------------- |
+| POST   | `/api/products`     | Create product |
+| PUT    | `/api/products/:id` | Update product |
+| DELETE | `/api/products/:id` | Delete product |
+
+### ➕ Category CRUD (Admin only)
+
+| Method | Endpoint              | Description          |
+| ------ | --------------------- | -------------------- |
+| POST   | `/api/categories`     | Create category      |
+| PUT    | `/api/categories/:id` | Update category      |
+| DELETE | `/api/categories/:id` | Soft-delete category |
+
+---
+
+## 🗂 Seeding Data
+
+### Categories Seed
+
+```bash
+npm run seed:categories
+```
+
+### Products Seed
+
+```bash
+npm run seed:products
+```
+
+> Categories must be seeded first.
 
 ---
 
@@ -411,15 +461,30 @@ npm run format
 
 ## ✅ Features Summary
 
-- JWT Auth (Cookies)
-- Email Verification
-- Password Reset
-- Google OAuth
-- Cart System
-- Orders & Tracking
-- Guest Checkout
-- Dockerized PostgreSQL
-- Clean MVC Architecture
+* JWT Auth (Cookies)
+* Email Verification
+* Password Reset
+* Google OAuth
+* Cart System
+* Orders & Tracking
+* Guest Checkout
+* Product & Category CRUD
+* Product Filtering, Sorting, Pagination
+* Product BuyTogether & Related Products
+* Dockerized PostgreSQL
+* Seeding Scripts
+* Clean MVC Architecture
+
+---
+
+## 🔧 Developer Instructions
+
+1. Seed categories: `npm run seed:categories`
+2. Seed products: `npm run seed:products`
+3. Start backend (Docker): `docker compose up --build`
+4. Start backend (local): `npm start`
+5. Configure `.env` properly before running.
+6. Test API using Postman or similar tools.
 
 ---
 

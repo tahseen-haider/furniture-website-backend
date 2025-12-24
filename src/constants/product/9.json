@@ -4,8 +4,8 @@
     "title": "Minimal Table Decor Set",
     "price": [3500, 3850],
     "slug": "minimal-table-decor-set",
-    "categories": ["Decor"],
-    "generalCategory": "Home Decor",
+    "categories": ["table-decor", "home-accessories"],
+    "generalCategory": "table-decor",
     "vendor": "Vendor Name",
 
     "description": "A minimalist table decor set perfect for enhancing the elegance of your living space or office desk.",

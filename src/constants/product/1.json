@@ -4,8 +4,8 @@
     "title": "Luxury King Bed Set",
     "price": [95000, 120000],
     "slug": "luxury-king-bed-set",
-    "categories": ["Beds"],
-    "generalCategory": "Home Decor",
+    "categories": ["bed-sets", "home-accessories"],
+    "generalCategory": "bed-sets",
     "vendor": "Vendor Name",
 
     "description": "Premium king-size bed crafted from solid Sheesham wood. Includes comfortable mattress, soft cushioning, and durable frame for long-lasting use.",

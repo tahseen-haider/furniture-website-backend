@@ -4,8 +4,8 @@
     "title": "Classic Wooden Chest",
     "price": [54000, 59400],
     "slug": "classic-wooden-chest",
-    "categories": ["Furniture"],
-    "generalCategory": "Home Decor",
+    "categories": ["chests-sideboards", "home-accessories"],
+    "generalCategory": "chests-sideboards",
     "vendor": "Vendor Name",
 
     "description": "A timeless wooden chest crafted from high-quality wood. Ideal for storing essentials while adding a classic touch to your living space.",

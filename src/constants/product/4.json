@@ -4,8 +4,8 @@
     "title": "Golden Console with Mirror Frame",
     "price": [38000, 52000],
     "slug": "golden-console-with-mirror-frame",
-    "categories": ["Furniture"],
-    "generalCategory": "Home Decor",
+    "categories": ["consoles-frames", "mirror-frames", "home-accessories"],
+    "generalCategory": "consoles-frames",
     "vendor": "Vendor Name",
 
     "description": "Elegant golden console table with a matching mirror frame. Perfect for hallways or living rooms, adding a touch of luxury and sophistication to your home.",

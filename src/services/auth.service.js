@@ -145,9 +145,13 @@ export const loginService = async (email, password) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw createError('Incorrect password', 401);
 
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-    expiresIn: '1d',
-  });
+  const token = jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '1d',
+    }
+  );
 
   return {
     user: { id: user.id, email: user.email, username: user.username },

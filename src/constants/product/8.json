@@ -4,8 +4,8 @@
     "title": "Antique Mirror Frame",
     "price": [14000, 18000],
     "slug": "antique-mirror-frame",
-    "categories": ["Decor"],
-    "generalCategory": "Home Decor",
+    "categories": ["mirror-frames", "home-accessories"],
+    "generalCategory": "mirror-frames",
     "vendor": "Vendor Name",
 
     "description": "Beautiful antique mirror frame with intricate carvings. Adds elegance and sophistication to any room or hallway.",
