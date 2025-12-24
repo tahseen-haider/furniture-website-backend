@@ -4,8 +4,8 @@
     "title": "Luxury Home Decor Bundle",
     "price": [12000, 20000],
     "slug": "luxury-home-decor-bundle",
-    "categories": ["Home Decor"],
-    "generalCategory": "Home Decor",
+    "categories": ["home-accessories", "table-decor", "sculptures"],
+    "generalCategory": "home-accessories",
     "vendor": "Vendor Name",
 
     "description": "A curated bundle of luxury home decor items including vases, candle holders, and decorative pieces to elevate your living space.",

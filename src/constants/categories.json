@@ -2,96 +2,112 @@
   {
     "id": 1,
     "title": "Bed Sets",
+    "slug": "bed-sets",
     "link": "/collections/bed-sets",
     "image": "/images/collections/bed-sets.webp"
   },
   {
     "id": 2,
     "title": "Dining Tables",
+    "slug": "dining-tables",
     "link": "/collections/dining-sets",
     "image": "/images/collections/dining-sets.webp"
   },
   {
     "id": 3,
     "title": "Sofa and Chairs",
+    "slug": "sofa-and-chairs",
     "link": "/collections/sofa-sets-chairs",
     "image": "/images/collections/sofa-sets-chairs.webp"
   },
   {
     "id": 4,
     "title": "Cushions",
+    "slug": "cushions",
     "link": "/collections/cushions",
     "image": "/images/collections/cushions.webp"
   },
   {
     "id": 5,
     "title": "Consoles & Frames",
+    "slug": "consoles-frames",
     "link": "/collections/console-frames",
     "image": "/images/collections/console-frames.webp"
   },
   {
     "id": 6,
     "title": "Planters",
+    "slug": "planters",
     "link": "/collections/planters",
     "image": "/images/collections/planters.webp"
   },
   {
     "id": 7,
     "title": "Home Accessories",
+    "slug": "home-accessories",
     "link": "/collections/home-accessories",
     "image": "/images/collections/home-accessories.webp"
   },
   {
     "id": 8,
     "title": "Chests & Sideboards",
+    "slug": "chests-sideboards",
     "link": "/collections/chests",
     "image": "/images/collections/chests.webp"
   },
   {
     "id": 9,
     "title": "Mirror Frames",
+    "slug": "mirror-frames",
     "link": "/collections/mirror-frames",
     "image": "/images/collections/mirror-frames.webp"
   },
   {
     "id": 10,
     "title": "Table Decor",
+    "slug": "table-decor",
     "link": "/collections/table-decor",
     "image": "/images/collections/table-decor.webp"
   },
   {
     "id": 11,
     "title": "Lamps & Lights",
+    "slug": "lamps-lights",
     "link": "/collections/lamps-lights",
     "image": "/images/collections/lamps-lights.webp"
   },
   {
     "id": 12,
     "title": "Table Lamps and Lights",
+    "slug": "table-lamps-and-lights",
     "link": "/collections/table-lamps",
     "image": "/images/collections/table-lamps.webp"
   },
   {
     "id": 13,
     "title": "Coffee and Center Tables",
+    "slug": "coffee-and-center-tables",
     "link": "/collections/tables",
     "image": "/images/collections/tables.webp"
   },
   {
     "id": 14,
     "title": "Writing Desks",
+    "slug": "writing-desks",
     "link": "/collections/writing-desk",
     "image": "/images/collections/writing-desk.webp"
   },
   {
     "id": 15,
     "title": "Swings",
+    "slug": "swings",
     "link": "/collections/swings",
     "image": "/images/collections/swings.webp"
   },
   {
     "id": 16,
     "title": "Sculptures",
+    "slug": "sculptures",
     "link": "/collections/sculptures",
     "image": "/images/collections/sculptures.webp"
   }

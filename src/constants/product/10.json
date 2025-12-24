@@ -4,8 +4,8 @@
     "title": "LED Standing Floor Lamp",
     "price": [9000, 14000],
     "slug": "led-standing-floor-lamp",
-    "categories": ["Lighting"],
-    "generalCategory": "Home Decor",
+    "categories": ["lamps-lights", "home-accessories"],
+    "generalCategory": "lamps-lights",
     "vendor": "Vendor Name",
 
     "description": "Modern LED standing floor lamp with adjustable brightness. Perfect for living rooms, bedrooms, or offices, providing both style and functional lighting.",
