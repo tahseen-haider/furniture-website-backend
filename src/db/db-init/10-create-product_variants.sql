@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS product_variants (
+  id SERIAL PRIMARY KEY,
+  product_id INT REFERENCES products(id) ON DELETE CASCADE,
+  variant_id VARCHAR(255) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  price NUMERIC NOT NULL
+);

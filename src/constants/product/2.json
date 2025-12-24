@@ -4,8 +4,8 @@
     "title": "Premium Bed Linen Set",
     "price": [8500, 9350],
     "slug": "premium-bed-linen-set",
-    "categories": ["Bedding"],
-    "generalCategory": "Home Decor",
+    "categories": ["bed-sets", "home-accessories"],
+    "generalCategory": "bed-sets",
     "vendor": "Vendor Name",
 
     "description": "High-quality bed linen set made from soft, breathable fabric. Includes sheets, pillowcases, and a duvet cover for ultimate comfort and style.",
