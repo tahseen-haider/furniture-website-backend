@@ -10,12 +10,12 @@ const seed = async () => {
     for (const c of categories) {
       const { rowCount } = await client.query(
         `
-    INSERT INTO categories (title, slug, link, image)
-    VALUES ($1,$2,$3,$4)
+    INSERT INTO categories (title, slug, image)
+    VALUES ($1,$2,$3)
     ON CONFLICT (slug) DO NOTHING
     RETURNING id
     `,
-        [c.title, c.slug, c.link, c.image]
+        [c.title, c.slug, c.image]
       );
 
       if (rowCount === 0) {
