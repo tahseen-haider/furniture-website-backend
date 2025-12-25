@@ -147,6 +147,199 @@ export async function getProductById(id) {
   }
 }
 
+export const updateProductById = async (id, product) => {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      `
+      UPDATE products
+      SET title=$1, slug=$2, description=$3, general_category=$4,
+          vendor=$5, free_shipping=$6, available=$7,
+          items_in_stock=$8, updated_at=NOW()
+      WHERE id=$9
+      RETURNING *
+      `,
+      [
+        product.title,
+        product.slug,
+        product.description,
+        product.generalCategory,
+        product.vendor,
+        product.freeShipping,
+        product.available,
+        product.itemsInStock,
+        id,
+      ]
+    );
+    return result.rows[0] || null;
+  } finally {
+    client.release();
+  }
+};
+
+export const deleteProductRelations = async (client, productId) => {
+  const tables = [
+    'product_categories',
+    'product_variants',
+    'product_images',
+    'product_features',
+    'product_buy_together',
+  ];
+
+  for (const table of tables) {
+    await client.query(`DELETE FROM ${table} WHERE product_id=$1`, [productId]);
+  }
+};
+
+export async function createProductBase(client, product) {
+  const {
+    title,
+    slug,
+    description,
+    generalCategory,
+    vendor,
+    freeShipping = false,
+    available = 'in',
+    itemsInStock = 0,
+  } = product;
+
+  const { rows } = await client.query(
+    `
+    INSERT INTO products
+    (title, slug, description, general_category, vendor, free_shipping, available, items_in_stock)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+    RETURNING *
+    `,
+    [
+      title,
+      slug,
+      description,
+      generalCategory,
+      vendor,
+      freeShipping,
+      available,
+      itemsInStock,
+    ]
+  );
+
+  return rows[0];
+}
+
+export const attachCategories = async (client, productId, categorySlugs) => {
+  if (!categorySlugs?.length) return;
+
+  const { rows } = await client.query(
+    `SELECT id, slug FROM categories WHERE slug = ANY($1)`,
+    [categorySlugs]
+  );
+
+  const foundSlugs = rows.map((r) => r.slug);
+  const missingSlugs = categorySlugs.filter(
+    (slug) => !foundSlugs.includes(slug)
+  );
+
+  if (missingSlugs.length) {
+    throw new Error(`Invalid category slugs: ${missingSlugs.join(', ')}`);
+  }
+
+  for (const c of rows) {
+    await client.query(
+      `INSERT INTO product_categories (product_id, category_id)
+       VALUES ($1,$2)
+       ON CONFLICT DO NOTHING`,
+      [productId, c.id]
+    );
+  }
+};
+
+export async function attachVariants(client, productId, variants) {
+  if (!variants?.length) {
+    throw new Error('Product must have at least one variant');
+  }
+
+  for (const v of variants) {
+    if (v.price <= 0) {
+      throw new Error('Variant price must be > 0');
+    }
+
+    await client.query(
+      `
+      INSERT INTO product_variants (product_id, variant_id, title, price)
+      VALUES ($1,$2,$3,$4)
+      `,
+      [productId, v.variantId, v.title, v.price]
+    );
+  }
+}
+
+export async function attachImages(client, productId, images = []) {
+  for (const url of images) {
+    await client.query(
+      `
+      INSERT INTO product_images (product_id, image_url)
+      VALUES ($1,$2)
+      `,
+      [productId, url]
+    );
+  }
+}
+
+export async function attachFeatures(client, productId, features = []) {
+  for (const f of features) {
+    await client.query(
+      `
+      INSERT INTO product_features (product_id, feature_text)
+      VALUES ($1,$2)
+      `,
+      [productId, f]
+    );
+  }
+}
+
+export async function attachBuyTogether(client, productId, buyTogether = []) {
+  if (buyTogether.length > 2) {
+    throw new Error('Max 2 buy together products allowed');
+  }
+
+  for (const btId of buyTogether) {
+    if (btId === productId) continue;
+
+    await client.query(
+      `
+      INSERT INTO product_buy_together (product_id, buy_together_product_id)
+      VALUES ($1,$2)
+      `,
+      [productId, btId]
+    );
+  }
+}
+
+export async function regenerateRelatedProducts(client, productId) {
+  await client.query(`DELETE FROM product_related WHERE product_id = $1`, [
+    productId,
+  ]);
+
+  await client.query(
+    `
+    INSERT INTO product_related (product_id, related_product_id)
+    SELECT
+      $1,
+      p2.id
+    FROM product_categories pc1
+    JOIN product_categories pc2
+      ON pc1.category_id = pc2.category_id
+    JOIN products p2
+      ON pc2.product_id = p2.id
+    WHERE pc1.product_id = $1
+      AND p2.id != $1
+    GROUP BY p2.id
+    ORDER BY COUNT(*) DESC
+    LIMIT 6
+    `,
+    [productId]
+  );
+}
+
 export async function createProduct(client, product) {
   const {
     title,
@@ -209,6 +402,12 @@ export async function updateProduct(client, id, product) {
   return rows[0];
 }
 
-export async function deleteProduct(client, id) {
-  await client.query('DELETE FROM products WHERE id=$1', [id]);
-}
+export const deleteProductById = async (client, id) => {
+  const { rowCount } = await client.query(
+    'DELETE FROM products WHERE id=$1 RETURNING id',
+    [id]
+  );
+  if (rowCount === 0) {
+    throw new Error('Product not found');
+  }
+};
