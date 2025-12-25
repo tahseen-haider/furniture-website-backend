@@ -31,5 +31,5 @@ export const updateCategoryController = async (req, res) => {
 
 export const deleteCategoryController = async (req, res) => {
   await deleteCategory(req.params.id);
-  res.status(204).end();
+  res.status(200).json({ message: 'Category status changed to inactive' });
 };

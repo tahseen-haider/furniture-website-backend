@@ -1,11 +1,19 @@
+import { pool } from '#config';
 import {
+  createProductBase,
+  attachCategories,
+  attachVariants,
+  attachImages,
+  attachFeatures,
+  attachBuyTogether,
+  regenerateRelatedProducts,
   getAllProducts,
   getProductById,
-  createProduct as createProductModel,
-  updateProduct as updateProductModel,
-  deleteProduct as deleteProductModel,
+  deleteProductRelations,
+  updateProductById,
+  deleteProductById,
 } from '#models';
-import { pool } from '#config';
+import { validateCreateProductPayload } from '#validators';
 
 export const fetchProductsByCategoryService = async ({
   category,
@@ -116,13 +124,27 @@ export const fetchProductService = async (id) => {
   return getProductById(id);
 };
 
-export const createProductService = async (data) => {
+export const createProductService = async (payload) => {
   const client = await pool.connect();
+
   try {
     await client.query('BEGIN');
-    const product = await createProductModel(client, data);
+
+    const { product, categories, variants, images, features, buyTogether } =
+      payload;
+
+    const createdProduct = await createProductBase(client, product);
+
+    await attachCategories(client, createdProduct.id, categories);
+    await attachVariants(client, createdProduct.id, variants);
+    await attachImages(client, createdProduct.id, images);
+    await attachFeatures(client, createdProduct.id, features);
+    await attachBuyTogether(client, createdProduct.id, buyTogether);
+
+    await regenerateRelatedProducts(client, createdProduct.id);
+
     await client.query('COMMIT');
-    return product;
+    return createdProduct;
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
@@ -131,11 +153,33 @@ export const createProductService = async (data) => {
   }
 };
 
-export const updateProductService = async (id, data) => {
+export const updateProductService = async (id, payload) => {
+  const validation = validateCreateProductPayload(payload);
+  if (validation.errors.length) {
+    return { errors: validation.errors };
+  }
+
   const client = await pool.connect();
+
   try {
     await client.query('BEGIN');
-    const product = await updateProductModel(client, id, data);
+
+    const product = await updateProductById(id, payload.product);
+    if (!product) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+
+    await deleteProductRelations(client, id);
+
+    await attachCategories(client, id, payload.categories);
+    await attachVariants(client, id, payload.variants);
+    await attachImages(client, id, payload.images);
+    await attachFeatures(client, id, payload.features);
+    await attachBuyTogether(client, id, payload.buyTogether);
+
+    await regenerateRelatedProducts(client, id);
+
     await client.query('COMMIT');
     return product;
   } catch (err) {
@@ -150,7 +194,7 @@ export const deleteProductService = async (id) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    await deleteProductModel(client, id);
+    await deleteProductById(client, id);
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK');
