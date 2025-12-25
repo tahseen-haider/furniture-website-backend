@@ -159,9 +159,7 @@ export const loginService = async (email, password) => {
   };
 };
 
-export const getCurrentUserService = async (token) => {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  const user = await findUserById(decoded.id);
-
+export const getCurrentUserService = async (userId) => {
+  const user = await findUserById(userId);
   return { user };
 };

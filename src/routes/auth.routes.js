@@ -11,7 +11,7 @@ import {
   resetPassword,
 } from '#controllers';
 
-import { passport } from '#middlewares';
+import { passport, requireAuth } from '#middlewares';
 
 export const authRoutes = express.Router();
 
@@ -22,7 +22,7 @@ authRoutes.post('/request-password-set', requestPasswordSet);
 authRoutes.post('/reset-password', resetPassword);
 authRoutes.post('/login', login);
 authRoutes.post('/logout', logout);
-authRoutes.get('/me', getCurrentUser);
+authRoutes.get('/me', requireAuth, getCurrentUser);
 
 authRoutes.get(
   '/google',
