@@ -126,19 +126,9 @@ export const login = async (req, res, next) => {
 };
 
 export const getCurrentUser = async (req, res) => {
-  try {
-    const token = req.cookies.token;
-    if (!token) return res.status(401).json({ message: 'Not authenticated' });
-
-    const { user } = await getCurrentUserService(token);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    res.json({
-      user: { id: user.id, email: user.email, username: user.username },
-    });
-  } catch {
-    res.status(401).json({ message: 'Invalid token' });
-  }
+  const user = await getCurrentUserService(req.user.id);
+  if (!user) return res.status(404).json({ message: 'User not found' });
+  res.json(user);
 };
 
 export const logout = (req, res) => {
