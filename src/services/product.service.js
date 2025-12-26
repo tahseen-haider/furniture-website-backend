@@ -19,90 +19,102 @@ export const fetchProductsByCategoryService = async ({
   category,
   price_min,
   price_max,
-  sort,
+  sort = 'best-selling',
   page = 1,
   pageSize = 12,
+  available,
 }) => {
   const client = await pool.connect();
+
   try {
     const offset = (page - 1) * pageSize;
 
-    let whereClauses = ['1=1'];
-    const params = [];
-    let idx = 1;
-
-    if (category) {
-      whereClauses.push(`c.slug = $${idx++}`);
-      params.push(category);
-    }
-
-    if (price_min) {
-      whereClauses.push(`p.id IN (
-        SELECT pv.product_id FROM product_variants pv WHERE pv.price >= $${idx++}
-      )`);
-      params.push(price_min);
-    }
-
-    if (price_max) {
-      whereClauses.push(`p.id IN (
-        SELECT pv.product_id FROM product_variants pv WHERE pv.price <= $${idx++}
-      )`);
-      params.push(price_max);
-    }
-
-    let orderBy = 'p.title ASC';
-    if (sort === 'title-descending') orderBy = 'p.title DESC';
-    else if (sort === 'price-ascending') orderBy = 'MIN(pv.price) ASC';
-    else if (sort === 'price-descending') orderBy = 'MAX(pv.price) DESC';
+    const baseParams = [
+      Number.isFinite(price_min) ? price_min : null,
+      Number.isFinite(price_max) ? price_max : null,
+      category,
+    ];
 
     const countQuery = `
-      SELECT COUNT(DISTINCT p.id) AS total
-      FROM products p
-      JOIN product_categories pc ON p.id = pc.product_id
-      JOIN categories c ON pc.category_id = c.id
-      JOIN product_variants pv ON p.id = pv.product_id
-      WHERE ${whereClauses.join(' AND ')}
+      WITH filtered_variants AS (
+        SELECT *
+        FROM product_variants
+        WHERE
+          ($1::numeric IS NULL OR price >= $1)
+          AND ($2::numeric IS NULL OR price <= $2)
+      )
+      SELECT COUNT(*) FROM (
+        SELECT p.id
+        FROM products p
+        JOIN product_categories pc ON p.id = pc.product_id
+        JOIN categories c ON pc.category_id = c.id
+        JOIN filtered_variants fv ON p.id = fv.product_id
+        WHERE c.slug = $3
+        GROUP BY p.id
+      ) sub;
     `;
-    const { rows: countRows } = await client.query(countQuery, params);
-    const totalItems = parseInt(countRows[0].total, 10);
+
+    const { rows: countRows } = await client.query(countQuery, baseParams);
+    const totalItems = Number(countRows[0].count);
     const totalPages = Math.ceil(totalItems / pageSize);
 
+    const queryParams = [...baseParams, sort, pageSize, offset, available];
+
     const query = `
-      SELECT
-        p.id,
-        p.title,
-        p.slug,
-        p.general_category,
-        p.vendor,
-        ARRAY_AGG(DISTINCT pi.image_url) AS images,
-        JSON_AGG(DISTINCT JSONB_BUILD_OBJECT(
-          'id', pv.variant_id,
-          'title', pv.title,
-          'price', pv.price
-        )) AS variants,
-        ARRAY_AGG(DISTINCT pv.price) AS price
-      FROM products p
-      JOIN product_categories pc ON p.id = pc.product_id
-      JOIN categories c ON pc.category_id = c.id
-      JOIN product_variants pv ON p.id = pv.product_id
-      LEFT JOIN product_images pi ON p.id = pi.product_id
-      WHERE ${whereClauses.join(' AND ')}
-      GROUP BY p.id
-      ORDER BY ${orderBy}
-      LIMIT $${idx++} OFFSET $${idx++}
+      WITH filtered_variants AS (
+        SELECT *
+        FROM product_variants
+        WHERE
+          ($1::numeric IS NULL OR price >= $1)
+          AND ($2::numeric IS NULL OR price <= $2)
+      )
+      SELECT *
+      FROM (
+        SELECT
+          p.id,
+          p.title,
+          p.slug,
+          ARRAY_AGG(DISTINCT pi.image_url) AS images,
+          JSON_AGG(
+            DISTINCT JSONB_BUILD_OBJECT(
+              'id', fv.variant_id,
+              'title', fv.title,
+              'price', fv.price
+            )
+          ) AS variants,
+          MIN(fv.price) AS min_price,
+          MAX(fv.price) AS max_price,
+          p.created_at,
+          p.sold
+        FROM products p
+        JOIN product_categories pc ON p.id = pc.product_id
+        JOIN categories c ON pc.category_id = c.id
+        JOIN filtered_variants fv ON p.id = fv.product_id
+        LEFT JOIN product_images pi ON p.id = pi.product_id
+        WHERE c.slug = $3 AND p.available = $7
+        GROUP BY p.id
+      ) sub
+      ORDER BY
+        CASE WHEN $4 = 'title-ascending' THEN sub.title END ASC,
+        CASE WHEN $4 = 'title-descending' THEN sub.title END DESC,
+        CASE WHEN $4 = 'price-ascending' THEN sub.min_price END ASC,
+        CASE WHEN $4 = 'price-descending' THEN sub.min_price END DESC,
+        CASE WHEN $4 = 'created-ascending' THEN sub.created_at END ASC,
+        CASE WHEN $4 = 'created-descending' THEN sub.created_at END DESC,
+        CASE WHEN $4 = 'best-selling' THEN sub.sold END DESC
+      LIMIT $5 OFFSET $6;
     `;
 
-    params.push(pageSize, offset);
-    const { rows } = await client.query(query, params);
+    const { rows } = await client.query(query, queryParams);
 
     return {
       products: rows.map((r) => ({
         id: r.id,
         title: r.title,
         slug: r.slug,
-        images: r.images || [],
-        variants: r.variants || [],
-        price: r.price ? [Math.min(...r.price), Math.max(...r.price)] : [],
+        images: r.images ?? [],
+        variants: r.variants ?? [],
+        price: [Number(r.min_price), Number(r.max_price)],
       })),
       pagination: {
         currentPage: page,
