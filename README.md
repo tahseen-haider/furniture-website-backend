@@ -6,15 +6,15 @@ A production-ready Node.js + Express backend using PostgreSQL, JWT authenticatio
 
 ## 📦 Tech Stack
 
-* Node.js 20
-* Express (ESM)
-* PostgreSQL
-* JWT Authentication (Cookies)
-* Google OAuth 2.0
-* Nodemailer (Email)
-* Docker & Docker Compose
-* ESLint + Prettier
-* Husky (Git Hooks)
+- Node.js 20
+- Express (ESM)
+- PostgreSQL
+- JWT Authentication (Cookies)
+- Google OAuth 2.0
+- Nodemailer (Email)
+- Docker & Docker Compose
+- ESLint + Prettier
+- Husky (Git Hooks)
 
 ---
 
@@ -92,8 +92,8 @@ docker compose up --build -d
 
 Services started:
 
-* Backend → [http://localhost:5000](http://localhost:5000)
-* PostgreSQL → localhost:5432
+- Backend → [http://localhost:5000](http://localhost:5000)
+- PostgreSQL → localhost:5432
 
 > Database tables are auto-initialized from `src/db/db-init/*.sql`.
 
@@ -112,7 +112,6 @@ docker exec -it myapp-backend npm run seed:products
 > ✅ This ensures that your database has the initial data required for the backend to function properly.
 
 ---
-
 
 ## 🧪 Running Locally (Without Docker)
 
@@ -461,19 +460,19 @@ npm run format
 
 ## ✅ Features Summary
 
-* JWT Auth (Cookies)
-* Email Verification
-* Password Reset
-* Google OAuth
-* Cart System
-* Orders & Tracking
-* Guest Checkout
-* Product & Category CRUD
-* Product Filtering, Sorting, Pagination
-* Product BuyTogether & Related Products
-* Dockerized PostgreSQL
-* Seeding Scripts
-* Clean MVC Architecture
+- JWT Auth (Cookies)
+- Email Verification
+- Password Reset
+- Google OAuth
+- Cart System
+- Orders & Tracking
+- Guest Checkout
+- Product & Category CRUD
+- Product Filtering, Sorting, Pagination
+- Product BuyTogether & Related Products
+- Dockerized PostgreSQL
+- Seeding Scripts
+- Clean MVC Architecture
 
 ---
 

@@ -7,6 +7,7 @@ import {
   fetchProductsByCategoryService,
 } from '#services';
 import { validateCreateProductPayload } from '#validators';
+import { productsPerPage } from '#config';
 
 export async function getProducts(_req, res) {
   const products = await fetchProductsService();
@@ -14,16 +15,45 @@ export async function getProducts(_req, res) {
 }
 
 export const getProductsByCategory = async (req, res) => {
-  const { price_min, price_max, sort, page } = req.query;
-  const data = await fetchProductsByCategoryService({
-    category: req.params.category,
-    price_min: price_min ? Number(price_min) : undefined,
-    price_max: price_max ? Number(price_max) : undefined,
-    sort,
-    page: page ? Number(page) : 1,
-    pageSize: 12,
-  });
-  res.json(data);
+  try {
+    const {
+      price_min,
+      price_max,
+      sort: sortQuery,
+      page,
+      available = 'in',
+    } = req.query;
+
+    const sort =
+      typeof sortQuery === 'string' && sortQuery.length
+        ? sortQuery
+        : 'title-ascending';
+
+    const priceMin =
+      price_min !== undefined && price_min !== ''
+        ? Number(price_min)
+        : undefined;
+    const priceMax =
+      price_max !== undefined && price_max !== ''
+        ? Number(price_max)
+        : undefined;
+
+    const args = {
+      category: req.params.category,
+      price_min: Number.isFinite(priceMin) ? priceMin : undefined,
+      price_max: Number.isFinite(priceMax) ? priceMax : undefined,
+      sort,
+      page: Number(page) || 1,
+      pageSize: productsPerPage || 12,
+      available,
+    };
+    const data = await fetchProductsByCategoryService(args);
+
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch products' });
+  }
 };
 
 export async function getProductById(req, res) {
