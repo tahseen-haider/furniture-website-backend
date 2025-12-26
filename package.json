@@ -4,7 +4,7 @@
   "description": "A starter Node.js + Express backend with PostgreSQL. This repository contains a minimal, opinionated setup for building REST APIs with user authentication, environment-driven configuration, and database migrations/seeding guidance.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/server.js",
+    "start": "node api.js && nodemon src/server.js",
     "lint": "eslint . --ext .js,.ts",
     "lint-fix": "eslint . --ext .js,.ts --fix",
     "format": "prettier --write .",
