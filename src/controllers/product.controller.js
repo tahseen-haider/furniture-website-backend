@@ -2,6 +2,7 @@ import {
   fetchProductsService,
   fetchProductService,
   createProductService,
+  fetchProductsAdminService,
   updateProductService,
   deleteProductService,
   fetchProductsByCategoryService,
@@ -72,12 +73,29 @@ export async function createProduct(req, res) {
     });
   }
 
-  const product = await createProductService(req.body);
+  const result = await createProductService(req.body);
+
+  if (result.exists) {
+    return res.status(409).json({
+      message: 'Product with this slug already exists',
+      productId: result.id,
+    });
+  }
 
   res.status(201).json({
-    product,
+    product: result.product,
   });
 }
+
+export const getProductsAdmin = async (_req, res) => {
+  try {
+    const products = await fetchProductsAdminService();
+    res.json({ products });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch products for admin' });
+  }
+};
 
 export async function updateProduct(req, res) {
   const { errors } = validateCreateProductPayload(req.body);

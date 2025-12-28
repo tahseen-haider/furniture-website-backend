@@ -4,7 +4,7 @@ export const insertCategory = async (client, { title, slug, image }) => {
   const { rows } = await client.query(
     `
     INSERT INTO categories (title, slug, image)
-    VALUES ($1,$2,$3)
+    VALUES ($1, $2, $3)
     RETURNING *
     `,
     [title, slug, image]

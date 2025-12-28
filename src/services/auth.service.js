@@ -103,9 +103,7 @@ export const signupService = async (email, password, username) => {
   await sendVerificationEmail(email, verificationToken);
 
   return {
-    id: user.id,
-    email: user.email,
-    username: user.username,
+    user: { email: user.email, username: user.username, role: user.role },
   };
 };
 
@@ -154,12 +152,14 @@ export const loginService = async (email, password) => {
   );
 
   return {
-    user: { id: user.id, email: user.email, username: user.username },
+    user: { email: user.email, username: user.username, role: user.role },
     token,
   };
 };
 
 export const getCurrentUserService = async (userId) => {
   const user = await findUserById(userId);
-  return { user };
+  return {
+    user: { email: user.email, username: user.username, role: user.role },
+  };
 };
