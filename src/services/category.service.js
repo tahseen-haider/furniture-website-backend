@@ -12,9 +12,21 @@ export const createCategory = async (data) => {
 
   try {
     await client.query('BEGIN');
+
+    const { rows: existing } = await client.query(
+      'SELECT id FROM categories WHERE slug = $1',
+      [data.slug]
+    );
+
+    if (existing.length > 0) {
+      await client.query('ROLLBACK');
+      return { exists: true, id: existing[0].id };
+    }
+
     const category = await insertCategory(client, data);
+
     await client.query('COMMIT');
-    return category;
+    return { exists: false, category };
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;

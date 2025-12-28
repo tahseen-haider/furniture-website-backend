@@ -87,7 +87,7 @@ export const createUser = async ({
   const { rows } = await pool.query(
     `INSERT INTO users (email, password, username, verification_token)
      VALUES ($1, $2, $3, $4)
-     RETURNING id, email, username, is_verified`,
+     RETURNING email, username, is_verified, role`,
     [email, String(password), username, verificationToken]
   );
 
@@ -128,7 +128,7 @@ export const findUserByEmail = async (email) => {
 
 export const findUserById = async (id) => {
   const { rows } = await pool.query(
-    'SELECT id, email, username FROM users WHERE id = $1',
+    'SELECT email, username, role FROM users WHERE id = $1',
     [id]
   );
   return rows[0] || null;

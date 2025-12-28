@@ -136,6 +136,47 @@ export const fetchProductService = async (id) => {
   return getProductById(id);
 };
 
+export const fetchProductsAdminService = async () => {
+  const client = await pool.connect();
+  try {
+    const { rows } = await client.query(`
+      SELECT 
+        p.id,
+        p.title,
+        p.slug,
+        p.vendor,
+        p.available,
+        p.sold,
+        p.items_in_stock,
+        p.created_at,
+        ARRAY_AGG(DISTINCT c.slug) AS categories,
+        MIN(v.price) AS min_price,
+        MAX(v.price) AS max_price
+      FROM products p
+      LEFT JOIN product_categories pc ON p.id = pc.product_id
+      LEFT JOIN categories c ON pc.category_id = c.id
+      LEFT JOIN product_variants v ON p.id = v.product_id
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+    `);
+
+    return rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      slug: r.slug,
+      vendor: r.vendor,
+      categories: r.categories || [],
+      price: [Number(r.min_price), Number(r.max_price)],
+      available: r.available,
+      sold: r.sold,
+      itemsInStock: r.items_in_stock,
+      createdAt: r.created_at,
+    }));
+  } finally {
+    client.release();
+  }
+};
+
 export const createProductService = async (payload) => {
   const client = await pool.connect();
 
@@ -144,6 +185,16 @@ export const createProductService = async (payload) => {
 
     const { product, categories, variants, images, features, buyTogether } =
       payload;
+
+    const { rows: existingProducts } = await client.query(
+      'SELECT id FROM products WHERE slug = $1',
+      [product.slug]
+    );
+
+    if (existingProducts.length > 0) {
+      await client.query('ROLLBACK');
+      return { exists: true, id: existingProducts[0].id };
+    }
 
     const createdProduct = await createProductBase(client, product);
 
@@ -156,7 +207,7 @@ export const createProductService = async (payload) => {
     await regenerateRelatedProducts(client, createdProduct.id);
 
     await client.query('COMMIT');
-    return createdProduct;
+    return { exists: false, product: createdProduct };
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
