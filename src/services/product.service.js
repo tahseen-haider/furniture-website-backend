@@ -151,11 +151,13 @@ export const fetchProductsAdminService = async () => {
         p.created_at,
         ARRAY_AGG(DISTINCT c.slug) AS categories,
         MIN(v.price) AS min_price,
-        MAX(v.price) AS max_price
+        MAX(v.price) AS max_price,
+        (ARRAY_AGG(pi.image_url ORDER BY pi.id))[1] AS image
       FROM products p
       LEFT JOIN product_categories pc ON p.id = pc.product_id
       LEFT JOIN categories c ON pc.category_id = c.id
       LEFT JOIN product_variants v ON p.id = v.product_id
+      LEFT JOIN product_images pi ON p.id = pi.product_id
       GROUP BY p.id
       ORDER BY p.created_at DESC
     `);
@@ -165,6 +167,7 @@ export const fetchProductsAdminService = async () => {
       title: r.title,
       slug: r.slug,
       vendor: r.vendor,
+      image: r.image || null, // first image
       categories: r.categories || [],
       price: [Number(r.min_price), Number(r.max_price)],
       available: r.available,
