@@ -1,4 +1,21 @@
-import { createOrder, getOrderByTrackingId } from '#services';
+import { createOrder, getOrderByTrackingId, getOrdersService } from '#services';
+
+export const getOrders = async (req, res) => {
+  try {
+    const orders = await getOrdersService({
+      page: 1,
+      limit: 20,
+    });
+
+    return res.status(201).json({
+      message: 'Orders returned!',
+      orders,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Failed to create order' });
+  }
+};
 
 export const placeOrder = async (req, res) => {
   try {

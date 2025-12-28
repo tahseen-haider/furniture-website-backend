@@ -4,6 +4,7 @@ import { cartRoutes } from './cart.routes.js';
 import { ordersRoutes } from './orders.routes.js';
 import { categoryRoutes } from './category.routes.js';
 import { productRoutes } from './product.routes.js';
+import { adminRoutes } from './admin.routes.js';
 import { optionalAuth } from '#middlewares';
 
 const router = Router();
@@ -17,5 +18,6 @@ router.use('/cart', cartRoutes);
 router.use('/orders', optionalAuth, ordersRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/products', productRoutes);
+router.use('/admin', adminRoutes);
 
 export { router as appRoutes };

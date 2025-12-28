@@ -20,8 +20,21 @@ export const getCategory = async (req, res) => {
 };
 
 export const createCategoryController = async (req, res) => {
-  const category = await createCategory(req.body);
-  res.status(201).json(category);
+  try {
+    const result = await createCategory(req.body);
+
+    if (result.exists) {
+      return res.status(409).json({
+        message: 'Category with this slug already exists',
+        categoryId: result.id,
+      });
+    }
+
+    res.status(201).json(result.category);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to create category' });
+  }
 };
 
 export const updateCategoryController = async (req, res) => {

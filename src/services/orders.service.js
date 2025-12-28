@@ -8,6 +8,64 @@ import {
 import { sendOrderTrackingEmail } from '#utils';
 import crypto from 'crypto';
 
+export const getOrdersService = async ({
+  userId = null,
+  page = 1,
+  limit = 10,
+} = {}) => {
+  const client = await pool.connect();
+
+  try {
+    const offset = (page - 1) * limit;
+
+    const params = [];
+    let idx = 1;
+
+    let whereClause = '';
+    if (userId) {
+      whereClause = `WHERE o.user_id = $${idx}`;
+      params.push(userId);
+      idx++;
+    }
+
+    const { rows } = await client.query(
+      `
+      SELECT
+        o.tracking_id AS "trackingId",
+        o.status,
+        o.estimated_delivery AS "estimatedDelivery",
+        o.created_at AS "createdAt",
+        (
+          SELECT COUNT(*)::int
+          FROM order_items oi
+          WHERE oi.order_id = o.id
+        ) AS "productCount",
+        (
+          SELECT ot.status
+          FROM order_timeline ot
+          WHERE ot.order_id = o.id
+          ORDER BY ot.created_at DESC
+          LIMIT 1
+        ) AS "latestTimelineStatus"
+      FROM orders o
+      ${whereClause}
+      ORDER BY o.created_at DESC
+      LIMIT $${idx} OFFSET $${idx + 1}
+      `,
+      [...params, limit, offset]
+    );
+
+    return rows.map((o) => ({
+      ...o,
+      estimatedDelivery: o.estimatedDelivery
+        ? o.estimatedDelivery.toISOString().split('T')[0]
+        : null,
+    }));
+  } finally {
+    client.release();
+  }
+};
+
 export const createOrder = async (userId, data) => {
   const client = await pool.connect();
 
