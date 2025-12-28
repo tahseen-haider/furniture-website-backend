@@ -13,12 +13,15 @@ import {
   getOrder,
   getAllUsers,
   getUserById,
+  getStatsAdmin,
 } from '#controllers';
 
 export const adminRoutes = express.Router();
 
 adminRoutes.use(requireAuth);
 adminRoutes.use(adminAuth);
+
+adminRoutes.get('/dashboard/stats', getStatsAdmin);
 
 adminRoutes.get('/products', getProductsAdmin);
 adminRoutes.post('/products', createProduct);

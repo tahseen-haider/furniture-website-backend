@@ -4,3 +4,4 @@ export * from './orders.controller.js';
 export * from './category.controller.js';
 export * from './product.controller.js';
 export * from './user.controller.js';
+export * from './admin.controller.js';
