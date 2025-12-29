@@ -1,7 +1,7 @@
 import { pool } from '#config';
 import { findUserById } from '#models';
 
-export const getAllUsersService = async (req, res) => {
+export const getAllUsersService = async () => {
   const client = await pool.connect();
 
   try {
@@ -21,7 +21,7 @@ export const getAllUsersService = async (req, res) => {
 
     return rows;
   } catch {
-    return res.status(500).json({ message: 'Failed to fetch users' });
+    throw new Error('Failed to fetch users');
   } finally {
     client.release();
   }
