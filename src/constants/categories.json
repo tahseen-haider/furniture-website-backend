@@ -8,10 +8,10 @@
   },
   {
     "id": 2,
-    "title": "Dining Tables",
-    "slug": "dining-tables",
-    "link": "/collections/dining-sets",
-    "image": "/images/collections/dining-sets.webp"
+    "title": "Home Accessories",
+    "slug": "home-accessories",
+    "link": "/collections/home-accessories",
+    "image": "/images/collections/home-accessories.webp"
   },
   {
     "id": 3,
@@ -43,10 +43,10 @@
   },
   {
     "id": 7,
-    "title": "Home Accessories",
-    "slug": "home-accessories",
-    "link": "/collections/home-accessories",
-    "image": "/images/collections/home-accessories.webp"
+    "title": "Dining Tables",
+    "slug": "dining-tables",
+    "link": "/collections/dining-sets",
+    "image": "/images/collections/dining-sets.webp"
   },
   {
     "id": 8,

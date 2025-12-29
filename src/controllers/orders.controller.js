@@ -1,52 +1,52 @@
 import { createOrder, getOrderByTrackingId, getOrdersService } from '#services';
 
-export const getOrders = async (req, res) => {
+export const getOrders = async (req, res, next) => {
   try {
-    const orders = await getOrdersService({
-      page: 1,
-      limit: 20,
-    });
-
-    return res.status(201).json({
-      message: 'Orders returned!',
-      orders,
+    const orders = await getOrdersService({ page: 1, limit: 20 });
+    res.json({
+      success: true,
+      message: 'Orders fetched successfully',
+      data: { orders },
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Failed to create order' });
+    next(err);
   }
 };
 
-export const placeOrder = async (req, res) => {
+export const placeOrder = async (req, res, next) => {
   try {
     const userId = req.user?.id || null;
     const orderData = req.body;
-
     const order = await createOrder(userId, orderData);
 
-    return res.status(201).json({
-      message: 'Order placed! Check your email for Tracking ID.',
-      order,
+    res.status(201).json({
+      success: true,
+      message: 'Order placed successfully. Check your email for Tracking ID.',
+      data: { order },
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Failed to create order' });
+    next(err);
   }
 };
 
-export const getOrder = async (req, res) => {
-  const { trackingId } = req.params;
-
+export const getOrder = async (req, res, next) => {
   try {
+    const { trackingId } = req.params;
     const order = await getOrderByTrackingId(trackingId);
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
     }
 
-    return res.json(order);
+    res.json({
+      success: true,
+      message: 'Order fetched successfully',
+      data: { order },
+    });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Failed to fetch order' });
+    next(err);
   }
 };

@@ -10,7 +10,11 @@ import { optionalAuth } from '#middlewares';
 const router = Router();
 
 router.get('/health', (req, res) => {
-  res.json({ success: true, message: 'API is running!' });
+  res.json({
+    success: true,
+    message: 'API is running!',
+    data: {},
+  });
 });
 
 router.use('/auth', authRoutes);
