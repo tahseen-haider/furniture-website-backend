@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
 import {
@@ -13,8 +12,28 @@ import {
   createGoogleUser,
   attachGoogleIdToUser,
   verifyUserById,
+  saveRefreshToken,
 } from '#models';
-import { sendVerificationEmail, sendPasswordResetEmail } from '#utils';
+import {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+  signAccessToken,
+  signRefreshToken,
+} from '#utils';
+
+export const generateAuthTokens = async (user) => {
+  const payload = { id: user.id, role: user.role };
+
+  const accessToken = signAccessToken(payload);
+  const refreshToken = signRefreshToken(payload);
+
+  const refreshExpiresAt = new Date();
+  refreshExpiresAt.setDate(refreshExpiresAt.getDate() + 7);
+
+  await saveRefreshToken(user.id, refreshToken, refreshExpiresAt);
+
+  return { accessToken, refreshToken };
+};
 
 const createError = (message, status = 400) => {
   const err = new Error(message);
@@ -136,24 +155,19 @@ export const loginService = async (email, password) => {
   if (!user.is_verified) throw createError('Email not verified', 403);
   if (!user.password)
     throw createError(
-      'User registered via Google OAuth, Set Password to Login using email/password',
+      'User registered via Google OAuth, set password to login using email/password',
       400
     );
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw createError('Incorrect password', 401);
 
-  const token = jwt.sign(
-    { id: user.id, role: user.role },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: '1d',
-    }
-  );
+  const { accessToken, refreshToken } = await generateAuthTokens(user);
 
   return {
     user: { email: user.email, username: user.username, role: user.role },
-    token,
+    accessToken,
+    refreshToken,
   };
 };
 
