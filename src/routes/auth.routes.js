@@ -9,6 +9,7 @@ import {
   googleAuthCallback,
   requestPasswordSet,
   resetPassword,
+  refreshToken,
 } from '#controllers';
 
 import { passport, requireAuth } from '#middlewares';
@@ -23,6 +24,8 @@ authRoutes.post('/reset-password', resetPassword);
 authRoutes.post('/login', login);
 authRoutes.post('/logout', logout);
 authRoutes.get('/me', requireAuth, getCurrentUser);
+
+authRoutes.post('/refresh', refreshToken);
 
 authRoutes.get(
   '/google',

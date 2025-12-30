@@ -146,3 +146,35 @@ export const verifyUserByToken = async (token) => {
 
   return rows[0] || null;
 };
+
+export const saveRefreshToken = async (userId, token, expiresAt) => {
+  await pool.query(
+    `UPDATE users
+     SET refresh_token = $1,
+         refresh_token_expires = $2
+     WHERE id = $3`,
+    [token, expiresAt, userId]
+  );
+};
+
+export const findUserByRefreshToken = async (token) => {
+  const { rows } = await pool.query(
+    `SELECT id, email, role
+     FROM users
+     WHERE refresh_token = $1
+       AND refresh_token_expires > NOW()`,
+    [token]
+  );
+
+  return rows[0] || null;
+};
+
+export const clearRefreshToken = async (userId) => {
+  await pool.query(
+    `UPDATE users
+     SET refresh_token = NULL,
+         refresh_token_expires = NULL
+     WHERE id = $1`,
+    [userId]
+  );
+};

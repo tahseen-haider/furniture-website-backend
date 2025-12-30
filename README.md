@@ -133,7 +133,9 @@ Response:
 ```json
 {
   "success": true,
-  "message": "API is running!"
+  "message": "API is running!",
+  "data": {},
+  "errors": []
 }
 ```
 
@@ -440,7 +442,8 @@ Standard JSON error format:
 ```json
 {
   "success": false,
-  "message": "Error message"
+  "message": "Error message",
+  "errors": []
 }
 ```
 

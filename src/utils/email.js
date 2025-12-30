@@ -1,13 +1,5 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
 const generateEmail = (url) => `
   <div style="font-family: Arial; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
     <h2 style="color: #333;">Verify Your Email</h2>
@@ -18,6 +10,13 @@ const generateEmail = (url) => `
 `;
 
 export const sendEmail = async (to, subject, html) => {
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
   await transporter.sendMail({
     from: `Auth System <${process.env.SMTP_USER}>`,
     to,
