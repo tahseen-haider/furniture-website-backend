@@ -1,3 +1,5 @@
+import { verifyRefreshToken, signAccessToken } from '#utils';
+import { clearRefreshToken, findUserByRefreshToken } from '#models';
 import {
   signupService,
   loginService,
@@ -7,20 +9,18 @@ import {
   loginWithGoogleService,
   sendPasswordResetEmailService,
   resetPasswordService,
+  generateAuthTokens,
 } from '#services';
-import jwt from 'jsonwebtoken';
 
 export const googleAuthCallback = async (req, res, next) => {
   try {
     const profile = req.user;
     const user = await loginWithGoogleService(profile);
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' }
-    );
+    const { accessToken, refreshToken } = await generateAuthTokens(user);
 
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+    res
+      .cookie('access_token', accessToken, { httpOnly: true })
+      .cookie('refresh_token', refreshToken, { httpOnly: true });
 
     res.send(`
       <html>
@@ -120,17 +120,66 @@ export const verifyEmail = async (req, res, next) => {
   }
 };
 
+export const refreshToken = async (req, res, next) => {
+  try {
+    const token = req.cookies.refresh_token;
+    if (!token) throw new Error('Refresh token missing');
+
+    verifyRefreshToken(token);
+    const user = await findUserByRefreshToken(token);
+    if (!user) throw new Error('Invalid refresh token');
+
+    const accessToken = signAccessToken({
+      id: user.id,
+      role: user.role,
+    });
+
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.json({
+      success: true,
+      message: 'Token refreshed',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const { user, token } = await loginService(email, password);
 
-    res.cookie('token', token, { httpOnly: true });
-    res.json({
-      success: true,
-      message: 'Login successful',
-      data: user,
-    });
+    const { user, accessToken, refreshToken } = await loginService(
+      email,
+      password
+    );
+
+    res
+      .cookie('access_token', accessToken, {
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 15 * 60 * 1000,
+      })
+      .cookie('refresh_token', refreshToken, {
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .json({
+        success: true,
+        message: 'Login successful',
+        data: {
+          user: {
+            email: user.email,
+            username: user.username,
+            role: user.role,
+          },
+        },
+      });
   } catch (err) {
     next(err);
   }
@@ -148,7 +197,13 @@ export const getCurrentUser = async (req, res) => {
   });
 };
 
-export const logout = (req, res) => {
-  res.clearCookie('token');
-  res.json({ success: true, message: 'Logged out successfully' });
+export const logout = async (req, res) => {
+  if (req.user?.id) {
+    await clearRefreshToken(req.user.id);
+  }
+
+  res.clearCookie('access_token').clearCookie('refresh_token').json({
+    success: true,
+    message: 'Logged out successfully',
+  });
 };
