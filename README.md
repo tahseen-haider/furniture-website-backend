@@ -1,20 +1,20 @@
 # 🧠 Node.js + Express Backend (PostgreSQL)
 
-A production-ready Node.js + Express backend using PostgreSQL, JWT authentication, Google OAuth, email verification, password reset, cart & orders system, and Dockerized setup.
+A production-ready Node.js + Express backend using PostgreSQL, JWT authentication, Google OAuth, email verification, password reset, cart & orders system, admin panel, and Dockerized setup.
 
 ---
 
 ## 📦 Tech Stack
 
-- Node.js 20
-- Express (ESM)
-- PostgreSQL
-- JWT Authentication (Cookies)
-- Google OAuth 2.0
-- Nodemailer (Email)
-- Docker & Docker Compose
-- ESLint + Prettier
-- Husky (Git Hooks)
+* Node.js 20
+* Express (ESM)
+* PostgreSQL
+* JWT Authentication (Cookies)
+* Google OAuth 2.0
+* Nodemailer (Email)
+* Docker & Docker Compose
+* ESLint + Prettier
+* Husky (Git Hooks)
 
 ---
 
@@ -24,13 +24,14 @@ A production-ready Node.js + Express backend using PostgreSQL, JWT authenticatio
 src/
 ├── app.js              # Express app configuration
 ├── server.js           # App entry point
-├── routes/             # API routes
+├── routes/             # API routes (auth, cart, orders, categories, products, admin)
 ├── controllers/        # Request handlers
 ├── services/           # Business logic
 ├── models/             # Database queries
 ├── middlewares/        # Authentication, error handling
 ├── utils/              # Email, authentication helpers
 ├── constants/          # Static data (products, categories)
+├── validators/         # Request validation
 ├── db/
 │   ├── index.js        # DB initialization
 │   └── db-init/        # SQL schema files
@@ -50,27 +51,31 @@ CLIENT_URL=http://localhost:5173
 BACKEND_URL=http://localhost:5000
 
 # JWT
-JWT_SECRET=supersecretjwtkey
+JWT_SECRET=your_super_secret_key
+JWT_ACCESS_SECRET=access_secret_here
+JWT_REFRESH_SECRET=refresh_secret_here
+ACCESS_TOKEN_EXPIRES=15m
+REFRESH_TOKEN_EXPIRES=7d
 
 # Email (Gmail SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_USER=your_email@gmail.com
-SMTP_PASS=your_app_password
+SMTP_HOST=<YOUR_SMTP_HOST>
+SMTP_PORT=<YOUR_SMTP_PORT>
+SMTP_USER=<YOUR_SMTP_USER>
+SMTP_PASS=<YOUR_SMTP_PASS>
 
 # Google OAuth
-GOOGLE_CLIENT_ID=xxxxx.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=xxxxx
+GOOGLE_CLIENT_ID=<YOUR_CLIENT_ID>
+GOOGLE_CLIENT_SECRET=<YOUR_CLIENT_SECRET>
+
 
 # Database (Docker)
-DB_USER=postgres
-DB_PASSWORD=postgres
-DB_NAME=myappdb
-DB_HOST=db
-
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=myappdb
+# DB_USER=postgres
+# DB_PASSWORD=tahsiein
+# DB_NAME=myappdb
+# DB_HOST=db
+# POSTGRES_USER=postgres
+# POSTGRES_PASSWORD=tahsiein
+# POSTGRES_DB=myappdb
 ```
 
 > ⚠️ Never commit `.env` to GitHub
@@ -79,27 +84,16 @@ POSTGRES_DB=myappdb
 
 ## 🐳 Running with Docker (Recommended)
 
-### 1️⃣ Build & Start Containers
-
-> ⚠️ **Windows Users Warning:**
-> Some scripts (like `wait-for-it.sh` or entrypoint scripts) may have **Windows-style line endings (`CRLF`)**.
-> Linux containers require **Unix-style line endings (`LF`)**.
-> Open the script in VS Code, check the bottom-right corner, and change `CRLF → LF`, then save.
-
 ```bash
 docker compose up --build -d
 ```
 
-Services started:
-
-- Backend → [http://localhost:5000](http://localhost:5000)
-- PostgreSQL → localhost:5432
+* Backend → [http://localhost:5000](http://localhost:5000)
+* PostgreSQL → localhost:5432
 
 > Database tables are auto-initialized from `src/db/db-init/*.sql`.
 
-### 2️⃣ Seed Initial Data
-
-After the containers are running, you can seed the database with categories and products:
+### Seed Initial Data
 
 ```bash
 # Seed categories
@@ -109,7 +103,22 @@ docker exec -it myapp-backend npm run seed:categories
 docker exec -it myapp-backend npm run seed:products
 ```
 
-> ✅ This ensures that your database has the initial data required for the backend to function properly.
+---
+
+## 👤 Promote a User to Admin
+
+Use `psql` inside the PostgreSQL container:
+
+```bash
+docker exec -it myapp-postgres psql -U postgres -d myappdb
+```
+
+```sql
+SELECT id, email, role FROM users WHERE email = 'user@example.com';
+UPDATE users SET role = 'admin' WHERE email = 'user@example.com';
+SELECT id, email, role FROM users WHERE email = 'user@example.com';
+\q
+```
 
 ---
 
@@ -120,20 +129,17 @@ npm install
 npm start
 ```
 
-Ensure PostgreSQL is running and `.env` values are correct.
-
 ---
 
 ## 🔥 API Health Check
 
 **GET /api/health**
 
-Response:
-
 ```json
 {
   "success": true,
-  "message": "API is running!"
+  "message": "API is running!",
+  "data": {}
 }
 ```
 
@@ -143,129 +149,17 @@ Response:
 
 **Base URL:** `/api/auth`
 
-### ➕ Signup
+* Signup: `POST /signup`
+* Verify Email: `GET /verify-email?token=TOKEN`
+* Resend Verification: `POST /send-verify-email`
+* Login: `POST /login`
+* Current User: `GET /me`
+* Logout: `POST /logout`
+* Request Password Reset: `POST /request-password-set`
+* Reset Password: `POST /reset-password`
+* Google OAuth: `GET /google` → `GET /google/callback`
 
-**POST /api/auth/signup**
-
-Body:
-
-```json
-{
-  "email": "user@email.com",
-  "password": "password123",
-  "username": "tahsin"
-}
-```
-
-Response:
-
-```json
-{
-  "message": "User created. Verify your email.",
-  "user": {
-    "id": 1,
-    "email": "user@email.com",
-    "username": "tahsin"
-  }
-}
-```
-
-### 📧 Verify Email
-
-**GET /api/auth/verify-email?token=TOKEN**
-
-➡ Redirects to frontend login page
-
-### 🔁 Resend Verification Email
-
-**POST /api/auth/send-verify-email**
-
-Body:
-
-```json
-{ "email": "user@email.com" }
-```
-
-### 🔑 Login
-
-**POST /api/auth/login**
-
-Body:
-
-```json
-{
-  "email": "user@email.com",
-  "password": "password123"
-}
-```
-
-Response:
-
-```json
-{
-  "message": "Login successful",
-  "user": {
-    "id": 1,
-    "email": "user@email.com",
-    "username": "tahsin"
-  }
-}
-```
-
-✅ JWT stored in HTTP-only cookie
-
-### 👤 Current User
-
-**GET /api/auth/me**
-
-Response:
-
-```json
-{
-  "user": {
-    "id": 1,
-    "email": "user@email.com",
-    "username": "tahsin"
-  }
-}
-```
-
-### 🚪 Logout
-
-**POST /api/auth/logout**
-
-### 🔐 Password Reset (Email)
-
-**POST /api/auth/request-password-set**
-
-Body:
-
-```json
-{ "email": "user@email.com" }
-```
-
-### 🔄 Reset Password
-
-**POST /api/auth/reset-password**
-
-Body:
-
-```json
-{
-  "email": "user@email.com",
-  "token": "RESET_TOKEN",
-  "password": "newpassword123"
-}
-```
-
-### 🔵 Google OAuth
-
-**GET /api/auth/google**
-
-Callback:
-**GET /api/auth/google/callback**
-
-✔ Automatically logs in & verifies user
+> JWT stored in HTTP-only cookie
 
 ---
 
@@ -273,37 +167,9 @@ Callback:
 
 **Base URL:** `/api/cart`
 
-🔒 Requires login
-
-### 📥 Get Cart
-
-**GET /api/cart**
-
-Response:
-
-```json
-{
-  "cart": { "productId": { "quantity": 2 } }
-}
-```
-
-### ✏️ Update Cart
-
-**PUT /api/cart**
-
-Body:
-
-```json
-{
-  "cart": {
-    "1": { "quantity": 2 }
-  }
-}
-```
-
-### 🧹 Clear Cart
-
-**DELETE /api/cart**
+* Get Cart: `GET /`
+* Update Cart: `PUT /`
+* Clear Cart: `DELETE /`
 
 ---
 
@@ -311,140 +177,53 @@ Body:
 
 **Base URL:** `/api/orders`
 
-Authentication: Optional (Guest checkout supported)
+* Place Order: `POST /place-order`
+* Track Order: `GET /track-order/:trackingId`
 
-### 🛍 Place Order
-
-**POST /api/orders/place-order**
-
-Body:
-
-```json
-{
-  "region": "PK",
-  "billingSameAsShipping": true,
-  "shippingAddress": {
-    "firstName": "Ali",
-    "lastName": "Khan",
-    "address": "Street 1",
-    "city": "Lahore",
-    "postalCode": "54000",
-    "phone": "03001234567",
-    "email": "ali@email.com"
-  },
-  "products": {
-    "1": {
-      "productId": 1,
-      "variantId": 2,
-      "title": "Chair",
-      "variantTitle": "Black",
-      "price": 5000,
-      "quantity": 1
-    }
-  }
-}
-```
-
-Response:
-
-```json
-{
-  "message": "Order placed! Check your email for Tracking ID.",
-  "order": {
-    "orderId": 10,
-    "trackingId": 181925941864448
-  }
-}
-```
-
-📧 Sends tracking email automatically
-
-### 🔎 Track Order
-
-**GET /api/orders/track-order/:trackingId**
-
-Response:
-
-```json
-{
-  "trackingId": "181925941864448",
-  "status": "Pending",
-  "estimatedDelivery": "2025-01-01",
-  "shippingAddress": {},
-  "billingAddress": {},
-  "products": [],
-  "timeline": []
-}
-```
+> Guest checkout supported
 
 ---
 
 ## 🛍 Products API
 
-### 📂 Categories
+* Get Categories: `GET /api/categories`
+* Products by Category: `GET /api/products/category/:category`
+* Product by ID: `GET /api/products/:productId`
 
-**GET /api/categories**
+---
 
-### 📦 Products by Category
+## 👑 Admin Routes (Authenticated + Admin)
 
-**GET /api/products/category/:category**
+**Base URL:** `/api/admin`
 
-Optional query params: `price_min`, `price_max`, `sort`, `page`, `pageSize`
+* Dashboard Stats: `GET /dashboard/stats`
+* Products: `GET /products`, `POST /products`, `PUT /products/:id`, `DELETE /products/:id`
+* Categories: `GET /categories`, `POST /categories`, `PUT /categories/:id`, `DELETE /categories/:id`
+* Orders: `GET /orders`, `GET /orders/:trackingId`
+* Users: `GET /users`, `GET /users/:userId`
 
-### 🧾 Product by ID
-
-**GET /api/products/:productId**
-
-> Loads data from database including variants, images, features, buyTogether, relatedProducts
-
-### ➕ Product CRUD (Admin only)
-
-| Method | Endpoint            | Description    |
-| ------ | ------------------- | -------------- |
-| POST   | `/api/products`     | Create product |
-| PUT    | `/api/products/:id` | Update product |
-| DELETE | `/api/products/:id` | Delete product |
-
-### ➕ Category CRUD (Admin only)
-
-| Method | Endpoint              | Description          |
-| ------ | --------------------- | -------------------- |
-| POST   | `/api/categories`     | Create category      |
-| PUT    | `/api/categories/:id` | Update category      |
-| DELETE | `/api/categories/:id` | Soft-delete category |
+> Generic request & response placeholders added for further customization.
 
 ---
 
 ## 🗂 Seeding Data
 
-### Categories Seed
-
 ```bash
 npm run seed:categories
-```
-
-### Products Seed
-
-```bash
 npm run seed:products
 ```
-
-> Categories must be seeded first.
 
 ---
 
 ## ❗ Error Handling
 
-Standard JSON error format:
-
 ```json
 {
   "success": false,
-  "message": "Error message"
+  "message": "Error message",
+  "errors": []
 }
 ```
-
-Handled globally via `errorMiddleware`.
 
 ---
 
@@ -460,29 +239,30 @@ npm run format
 
 ## ✅ Features Summary
 
-- JWT Auth (Cookies)
-- Email Verification
-- Password Reset
-- Google OAuth
-- Cart System
-- Orders & Tracking
-- Guest Checkout
-- Product & Category CRUD
-- Product Filtering, Sorting, Pagination
-- Product BuyTogether & Related Products
-- Dockerized PostgreSQL
-- Seeding Scripts
-- Clean MVC Architecture
+* JWT Auth (Cookies)
+* Email Verification
+* Password Reset
+* Google OAuth
+* Cart System
+* Orders & Tracking
+* Guest Checkout
+* Product & Category CRUD
+* Product Filtering, Sorting, Pagination
+* Product BuyTogether & Related Products
+* Admin Dashboard & Routes
+* Dockerized PostgreSQL
+* Seeding Scripts
+* Clean MVC Architecture
 
 ---
 
 ## 🔧 Developer Instructions
 
-1. Seed categories: `npm run seed:categories`
-2. Seed products: `npm run seed:products`
-3. Start backend (Docker): `docker compose up --build`
-4. Start backend (local): `npm start`
-5. Configure `.env` properly before running.
+1. Configure `.env`
+2. Seed categories: `npm run seed:categories`
+3. Seed products: `npm run seed:products`
+4. Start backend (Docker): `docker compose up --build`
+5. Start backend (local): `npm start`
 6. Test API using Postman or similar tools.
 
 ---
